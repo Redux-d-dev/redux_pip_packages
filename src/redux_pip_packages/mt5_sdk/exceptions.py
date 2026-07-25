@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
+from .constants import TradeRetcode, describe_retcode
+
 
 class Mt5GatewayError(Exception):
     """
@@ -18,7 +20,7 @@ class Mt5GatewayError(Exception):
     or catch a specific subclass for precise handling.
     """
 
-    def __init__(self, message: str, *, status_code: int | None = None, raw: Any = None):
+    def __init__(self, message: str, *, status_code: Optional[int] = None, raw: Any = None):
         super().__init__(message)
         self.status_code = status_code
         self.raw = raw  # the original response body/exception, for debugging
@@ -46,13 +48,29 @@ class TradeError(Mt5GatewayError):
     A trade request was understood and sent to the broker, but the
     broker/terminal rejected it (bad price, market closed, insufficient
     margin, invalid stops, etc). retcode is MT5's own trade return
-    code - see constants.TradeRetcode for the common ones.
+    code. Use .reason for a human-readable explanation, or
+    .retcode_name (e.g. "MARKET_CLOSED") to match against a specific
+    known code - no need to maintain your own retcode-to-meaning table.
     """
 
     def __init__(self, message: str, *, retcode: Optional[int] = None, raw: Any = None):
         super().__init__(message, status_code=400, raw=raw)
-        print(retcode)
         self.retcode = retcode
+
+    @property
+    def retcode_name(self) -> str:
+        if self.retcode is None:
+            return "UNKNOWN"
+        try:
+            return TradeRetcode(self.retcode).name
+        except ValueError:
+            return f"UNKNOWN_{self.retcode}"
+
+    @property
+    def reason(self) -> str:
+        if self.retcode is None:
+            return str(self)
+        return describe_retcode(self.retcode)
 
 
 class ValidationError(Mt5GatewayError):

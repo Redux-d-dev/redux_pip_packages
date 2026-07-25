@@ -13,6 +13,8 @@ from typing import Any, Optional
 from pydantic import BaseModel, ConfigDict
 
 
+from .constants import TradeRetcode, describe_retcode
+
 class _Base(BaseModel):
     model_config = ConfigDict(extra="allow")
 
@@ -148,13 +150,28 @@ class TradeResult(_Base):
 
     @property
     def is_success(self) -> bool:
-        from .constants import TradeRetcode
+        
         try:
             return TradeRetcode(self.retcode).is_success
         except ValueError:
             # An unrecognized retcode - be conservative, treat as failure
             # rather than silently assume success for an unknown code.
             return False
+
+    @property
+    def retcode_name(self) -> str:
+        """e.g. 'MARKET_CLOSED' - the enum name, for logging/matching against specific codes."""
+        
+        try:
+            return TradeRetcode(self.retcode).name
+        except ValueError:
+            return f"UNKNOWN_{self.retcode}"
+
+    @property
+    def reason(self) -> str:
+        """Human-readable explanation of what this retcode means - read this instead of maintaining your own code-to-meaning mapping."""
+        
+        return describe_retcode(self.retcode)
 
 
 class HealthStatus(_Base):

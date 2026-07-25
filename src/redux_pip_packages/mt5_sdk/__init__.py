@@ -19,11 +19,13 @@ Basic usage:
             result = await acct.trading.market_order("EURUSD", OrderSide.BUY, 0.01)
             if result.is_success:
                 print("Order filled:", result.deal)
+            else:
+                print(f"Rejected ({result.retcode_name}): {result.reason}")
 
     asyncio.run(main())
 """
 from .client import Account, GatewayClient, connect_account
-from .constants import OrderSide, PendingOrderType, Timeframe, TradeRetcode
+from .constants import OrderSide, PendingOrderType, Timeframe, TradeRetcode, describe_retcode
 from .exceptions import (
     AccountNotFoundError,
     AuthenticationError,
@@ -50,31 +52,32 @@ from .models import (
 )
 
 __all__ = [
-    "Account",
-    "AccountInfo",
-    "AccountNotFoundError",
-    "AuthenticationError",
-    "ConnectionError",
     "GatewayClient",
-    "HealthStatus",
+    "Account",
+    "connect_account",
+    "OrderSide",
+    "PendingOrderType",
+    "Timeframe",
+    "TradeRetcode",
+    "describe_retcode",
+    "Mt5GatewayError",
+    "AuthenticationError",
+    "AccountNotFoundError",
+    "TradeError",
+    "ValidationError",
+    "ServerError",
+    "TimeoutError",
+    "ConnectionError",
+    "TerminalInfo",
+    "AccountInfo",
+    "SymbolInfo",
+    "Tick",
+    "Rate",
+    "Position",
+    "PendingOrder",
     "HistoryDeal",
     "HistoryOrder",
-    "Mt5GatewayError",
-    "OrderSide",
-    "PendingOrder",
-    "PendingOrderType",
-    "Position",
-    "Rate",
-    "ServerError",
-    "SymbolInfo",
-    "TerminalInfo",
-    "TerminalStartResult",
-    "Tick",
-    "Timeframe",
-    "TimeoutError",
-    "TradeError",
     "TradeResult",
-    "TradeRetcode",
-    "ValidationError",
-    "connect_account",
+    "HealthStatus",
+    "TerminalStartResult",
 ]

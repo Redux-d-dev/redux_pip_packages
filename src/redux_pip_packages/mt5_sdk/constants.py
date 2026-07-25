@@ -57,6 +57,60 @@ class TradeRetcode(IntEnum):
         return self in (TradeRetcode.DONE, TradeRetcode.DONE_PARTIAL, TradeRetcode.PLACED)
 
 
+# Human-readable explanation for every retcode above - so callers can
+# just read `result.reason` instead of maintaining their own mapping
+# of numeric codes to meaning.
+TRADE_RETCODE_MESSAGES: dict[int, str] = {
+    TradeRetcode.REQUOTE: "Price changed - a requote occurred, the broker offered a new price.",
+    TradeRetcode.REJECT: "Request rejected by the broker/server.",
+    TradeRetcode.CANCEL: "Request canceled by the trader (e.g. in the terminal UI).",
+    TradeRetcode.PLACED: "Order placed successfully.",
+    TradeRetcode.DONE: "Request completed successfully.",
+    TradeRetcode.DONE_PARTIAL: "Request completed, but only partially filled.",
+    TradeRetcode.ERROR: "Request processing error.",
+    TradeRetcode.TIMEOUT: "Request timed out - no response from the server in time.",
+    TradeRetcode.INVALID: "Invalid request - malformed or missing required fields.",
+    TradeRetcode.INVALID_VOLUME: "Invalid volume in the request (below min, above max, or wrong step).",
+    TradeRetcode.INVALID_PRICE: "Invalid price in the request.",
+    TradeRetcode.INVALID_STOPS: "Invalid stop loss or take profit (too close to price, or invalid value).",
+    TradeRetcode.TRADE_DISABLED: "Trading is disabled for this account or symbol.",
+    TradeRetcode.MARKET_CLOSED: "Market is closed for this symbol right now.",
+    TradeRetcode.NO_MONEY: "Insufficient funds/margin to complete the request.",
+    TradeRetcode.PRICE_CHANGED: "Price changed since the request was sent.",
+    TradeRetcode.PRICE_OFF: "No quotes currently available for this symbol.",
+    TradeRetcode.INVALID_EXPIRATION: "Invalid order expiration date/time.",
+    TradeRetcode.ORDER_CHANGED: "Order state changed (e.g. already filled/canceled) before this request reached it.",
+    TradeRetcode.TOO_MANY_REQUESTS: "Too many requests sent too quickly - rate limited by the server.",
+    TradeRetcode.NO_CHANGES: "No actual changes in the request compared to the current order/position state.",
+    TradeRetcode.SERVER_DISABLES_AT: "Autotrading is disabled by the trade server.",
+    TradeRetcode.CLIENT_DISABLES_AT: "Autotrading is disabled by the client terminal.",
+    TradeRetcode.LOCKED: "Request locked for processing - try again shortly.",
+    TradeRetcode.FROZEN: "Order/position is frozen - modification/close not currently allowed.",
+    TradeRetcode.INVALID_FILL: "Invalid order filling type for this symbol.",
+    TradeRetcode.CONNECTION: "No connection to the trade server.",
+    TradeRetcode.ONLY_REAL: "Operation only allowed on a real account, not this account type.",
+    TradeRetcode.LIMIT_ORDERS: "Reached the maximum number of pending orders allowed.",
+    TradeRetcode.LIMIT_VOLUME: "Reached the maximum order/position volume allowed for this symbol.",
+    TradeRetcode.INVALID_ORDER: "Invalid or prohibited order type for this operation.",
+    TradeRetcode.POSITION_CLOSED: "Position already closed.",
+    TradeRetcode.CLOSE_ORDER_EXIST: "A close order for this position already exists.",
+    TradeRetcode.LIMIT_POSITIONS: "Reached the maximum number of open positions allowed.",
+    TradeRetcode.REJECT_CANCEL: "Rejected: pending order cancellation in progress.",
+    TradeRetcode.LONG_ONLY: "Only long (buy) positions allowed for this symbol.",
+    TradeRetcode.SHORT_ONLY: "Only short (sell) positions allowed for this symbol.",
+    TradeRetcode.CLOSE_ONLY: "Only position-closing operations allowed for this symbol right now.",
+    TradeRetcode.FIFO_CLOSE: "Positions must be closed in FIFO order (oldest first) for this account.",
+}
+
+
+def describe_retcode(retcode: int) -> str:
+    """Human-readable meaning for a retcode - falls back gracefully for anything unrecognized."""
+    try:
+        return TRADE_RETCODE_MESSAGES[TradeRetcode(retcode)]
+    except ValueError:
+        return f"Unrecognized retcode {retcode} - not in MT5's documented set."
+
+
 class OrderSide(str, Enum):
     BUY = "BUY"
     SELL = "SELL"
