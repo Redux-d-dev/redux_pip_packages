@@ -16,17 +16,17 @@ pip install -e .
 
 **From GitHub (latest):**
 ```bash
-pip install git+https://github.com/<you>/redux_py_packages.git
+pip install git+https://github.com/Redux-d-dev/redux_pip_packages.git
 ```
 
 **From GitHub (specific version):**
 ```bash
-pip install git+https://github.com/<you>/redux_py_packages.git@v0.2.0
+pip install git+https://github.com/Redux-d-dev/redux_pip_packages.git@v0.2.0
 ```
 
 **Upgrade to latest:**
 ```bash
-pip install --upgrade git+https://github.com/<you>/redux_py_packages.git
+pip install --upgrade git+https://github.com/Redux-d-dev/redux_pip_packages.git
 ```
 
 ## Usage
