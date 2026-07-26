@@ -70,7 +70,19 @@ def _raise_for_response(response: httpx.Response, *, account_id: Optional[str] =
             "API key missing or not authorized.", status_code=status, raw=body
         )
     if status == 404 and account_id is not None:
-        raise exc.AccountNotFoundError(account_id, status_code=status, raw=body)
+        # main.py raises this EXACT phrasing specifically for an
+        # unknown/unauthorized account_id - routes.py separately uses
+        # 404 generically for unknown symbols, tickets, etc (confirmed
+        # via testing: a bad symbol name produced this same status
+        # code, which the SDK previously misreported as an account
+        # problem). Only treat it as AccountNotFoundError when the
+        # message actually says so.
+        detail = body.get("detail") if isinstance(body, dict) else body
+        if isinstance(detail, str) and detail.startswith("Unknown account_id"):
+            raise exc.AccountNotFoundError(account_id, status_code=status, raw=body)
+        raise exc.ResourceNotFoundError(str(detail), status_code=status, raw=body)
+
+    
     if status == 504 or (status in _RETRYABLE_STATUS and isinstance(body, str)):
         raise exc.TimeoutError(
             "Gateway timed out - the underlying call may still be running server-side.",

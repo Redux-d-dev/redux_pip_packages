@@ -97,3 +97,11 @@ class TimeoutError(Mt5GatewayError):
 
 class ConnectionError(Mt5GatewayError):
     """Couldn't reach the gateway at all - DNS failure, connection refused, network unreachable."""
+
+class ResourceNotFoundError(Mt5GatewayError):
+    """
+    A specific resource wasn't found - an unknown symbol, position
+    ticket, or order ticket. Distinct from AccountNotFoundError: the
+    account_id itself was fine, it's something WITHIN that account
+    (a symbol name, a ticket) that doesn't exist.
+    """

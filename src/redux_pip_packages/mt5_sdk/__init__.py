@@ -35,6 +35,7 @@ from .exceptions import (
     TimeoutError,
     TradeError,
     ValidationError,
+    ResourceNotFoundError,
 )
 from .models import (
     AccountInfo,
@@ -51,7 +52,10 @@ from .models import (
     TradeResult,
 )
 
+
+
 __all__ = [
+    "ResourceNotFoundError",
     "GatewayClient",
     "Account",
     "connect_account",
