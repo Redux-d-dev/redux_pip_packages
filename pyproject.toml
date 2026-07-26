@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "redux-pip-packages"
-version = "0.1.2"
+version = "0.1.3"
 description = "Redux's internal Python packages (mt5_sdk, render_requests_helper)"
 readme = "README.md"
 requires-python = ">=3.10"
