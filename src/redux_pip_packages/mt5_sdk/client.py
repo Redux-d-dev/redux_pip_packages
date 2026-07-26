@@ -220,14 +220,31 @@ def _new_idempotency_key() -> str:
 class _TerminalNamespace:
     def __init__(self, account: Account):
         self._a = account
-
     async def info(self) -> TerminalInfo:
         resp = await self._a._request("GET", "/terminal/info", idempotent=True)
-        return TerminalInfo.model_validate(resp.json())
+        return self._validate_or_raise(TerminalInfo, resp.json())
 
     async def account_info(self) -> AccountInfo:
         resp = await self._a._request("GET", "/terminal/account/info", idempotent=True)
-        return AccountInfo.model_validate(resp.json())
+        return self._validate_or_raise(AccountInfo, resp.json())
+
+    @staticmethod
+    def _validate_or_raise(model, data):
+        """
+        The gateway returns a bare JSON `null` (still HTTP 200) when
+        MT5 isn't currently connected - confirmed via testing that
+        this happens right after a cold start, or during a transient
+        IPC hiccup (the same flakiness that showed up as ping()
+        toggling true/false under load during earlier testing).
+        Raise something explainable instead of letting Pydantic fail
+        with a confusing "expected dict, got None" error.
+        """
+        if data is None:
+            raise exc.ServerError(
+                "MT5 is not currently connected for this account - the terminal may still be "
+                "starting up, or the connection dropped transiently. Check health() or retry shortly."
+            )
+        return model.model_validate(data)
 
     async def version(self) -> list:
         resp = await self._a._request("GET", "/terminal/version", idempotent=True)
