@@ -171,6 +171,12 @@ class GatewayClient:
         resp = await self._request("GET", f"/health/{account_id}", account_id=account_id, idempotent=True)
         return HealthStatus.model_validate(resp.json())
 
+
+    async def list_running_accounts(self) -> list[dict[str, Any]]:
+        resp = await self._request("GET", "/accounts/running", idempotent=True)
+        return resp.json().get("running", [])
+
+
     async def start_terminal(self, account_id: str) -> TerminalStartResult:
         resp = await self._request("POST", f"/accounts/{account_id}/terminal/start", account_id=account_id)
         return TerminalStartResult.model_validate(resp.json())
