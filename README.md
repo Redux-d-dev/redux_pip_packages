@@ -14,9 +14,19 @@ Redux's internal Python packages — installable locally or directly from GitHub
 pip install -e .
 ```
 
+Add this to `requirements.txt`:
+```bash
+redux-pip-packages @ git+https://github.com/Redux-d-dev/redux_pip_packages.git
+```
+
 **From GitHub (latest):**
 ```bash
-pip install git+https://github.com/Redux-d-dev/redux_pip_packages.git
+pip install -r requirements.txt
+```
+
+**Upgrade to latest:**
+```bash
+pip install --upgrade -r requirements.txt
 ```
 
 **From GitHub (specific version):**
@@ -24,9 +34,14 @@ pip install git+https://github.com/Redux-d-dev/redux_pip_packages.git
 pip install git+https://github.com/Redux-d-dev/redux_pip_packages.git@v0.2.0
 ```
 
-**Upgrade to latest:**
+**Uninstall thw Package:**
 ```bash
-pip install --upgrade git+https://github.com/Redux-d-dev/redux_pip_packages.git
+pip uninstall redux-pip-packages
+
+Or
+
+pip uninstall -r requirements.txt
+
 ```
 
 ## Usage
