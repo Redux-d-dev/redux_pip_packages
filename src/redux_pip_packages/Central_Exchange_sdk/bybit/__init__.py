@@ -178,7 +178,7 @@ class Bybit(RenderRequestsHelper):
                     raise Exception("Empty response from Bybit")
 
                 if data.get("retCode") != 0:
-                    raise Exception(f"Bybit API Error [{data.get('retCode')}]: {data.get('retMsg')}")
+                    raise Exception(f"Bybit API Error [{data.get('retCode', data.get("ret_code"))}]: {data.get('retMsg', data.get('ret_msg', 'Unknown error message'))}")
 
                 if attempt > 1:
                     log(f"[BYBIT] Recovered on attempt {attempt}")
