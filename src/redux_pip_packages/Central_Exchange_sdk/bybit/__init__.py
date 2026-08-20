@@ -48,7 +48,7 @@ def resolve_api_key(api_keys: list, current_ip: str) -> dict | None:
         for entry in api_keys:
             if not entry.get("ip_range"):
                 key    = entry["key"]
-                secret = entry["secret"]-
+                secret = entry["secret"]
                 if key and secret:
                     log(f"Local mode → using fallback key: {entry['key_ref']}")
                     return {"key": key, "secret": secret}
