@@ -17,6 +17,7 @@ from ...render_requests_helper import RenderRequestsHelper
 load_dotenv()
 
 _log_cache: dict = {}
+IS_ON_RENDER = os.getenv("RENDER", "false").lower() == "true"
 
 def log(msg: str, cooldown: int = 60, key: str = None):
     now = time.time()
@@ -40,15 +41,14 @@ async def get_current_ip() -> str:
 
 
 
-
 def resolve_api_key(api_keys: list, current_ip: str) -> dict | None:
 
     # If local, always return the fallback key directly — no IP matching
-    if not os.environ.get("IS_ON_RENDER"):
+    if not IS_ON_RENDER:
         for entry in api_keys:
             if not entry.get("ip_range"):
                 key    = entry["key"]
-                secret = entry["secret"]
+                secret = entry["secret"]-
                 if key and secret:
                     log(f"Local mode → using fallback key: {entry['key_ref']}")
                     return {"key": key, "secret": secret}
@@ -59,7 +59,7 @@ def resolve_api_key(api_keys: list, current_ip: str) -> dict | None:
         ip_obj = ipaddress.ip_address(current_ip)
         last_octet = int(current_ip.split(".")[-1])
     except (ValueError, IndexError):
-        log.warning(f"Could not parse current IP: {current_ip}")
+        log(f"Could not parse current IP: {current_ip}")
         return None
 
     for entry in api_keys:
@@ -75,14 +75,14 @@ def resolve_api_key(api_keys: list, current_ip: str) -> dict | None:
             if ip_obj not in ipaddress.ip_network(subnet):
                 continue  # wrong subnet entirely — skip regardless of octet
         except ValueError:
-            log.warning(f"Invalid subnet in config for {entry.get('key_ref')}: {subnet}")
+            log(f"Invalid subnet in config for {entry.get('key_ref')}: {subnet}")
             continue
 
         if ip_range["start"] <= last_octet <= ip_range["end"]:
             key    = entry["key"]
             secret = entry["secret"]
             if key and secret:
-                log.info(f"Render mode → using key: {entry['key_ref']} (IP: {current_ip})")
+                log(f"Render mode → using key: {entry['key_ref']} (IP: {current_ip})")
                 return {"key": key, "secret": secret}
 
     return None
